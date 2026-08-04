@@ -30,8 +30,8 @@ function getApiBaseUrl() {
   return configuredBaseUrl ? configuredBaseUrl.replace(/\/$/, '') : 'http://localhost:8000'
 }
 
-function getApiEndpoint(path) {
-  return `${getApiBaseUrl()}/api/${path}/`
+function getApiEndpoint() {
+  return `${getApiBaseUrl()}/api/leaderboard/`
 }
 
 function Leaderboard({ apiBaseUrl = '' }) {
@@ -45,7 +45,7 @@ function Leaderboard({ apiBaseUrl = '' }) {
       const baseUrl = apiBaseUrl || getApiBaseUrl()
 
       try {
-        const response = await fetch(getApiEndpoint('leaderboard'))
+        const response = await fetch(getApiEndpoint())
         if (!response.ok) {
           throw new Error('Unable to load leaderboard')
         }

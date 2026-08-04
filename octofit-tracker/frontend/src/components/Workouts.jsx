@@ -30,8 +30,8 @@ function getApiBaseUrl() {
   return configuredBaseUrl ? configuredBaseUrl.replace(/\/$/, '') : 'http://localhost:8000'
 }
 
-function getApiEndpoint(path) {
-  return `${getApiBaseUrl()}/api/${path}/`
+function getApiEndpoint() {
+  return `${getApiBaseUrl()}/api/workouts/`
 }
 
 function Workouts({ apiBaseUrl = '' }) {
@@ -45,7 +45,7 @@ function Workouts({ apiBaseUrl = '' }) {
       const baseUrl = apiBaseUrl || getApiBaseUrl()
 
       try {
-        const response = await fetch(getApiEndpoint('workouts'))
+        const response = await fetch(getApiEndpoint())
         if (!response.ok) {
           throw new Error('Unable to load workouts')
         }
