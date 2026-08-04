@@ -20,7 +20,16 @@ function normalizeCollection(payload) {
   return []
 }
 
-function Teams({ apiBaseUrl = 'http://localhost:8000/api' }) {
+function getApiBaseUrl() {
+  const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim()
+  if (codespaceName) {
+    return `https://${codespaceName}-8000.app.github.dev/api`
+  }
+
+  return import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8000/api'
+}
+
+function Teams({ apiBaseUrl = '' }) {
   const [teams, setTeams] = useState([])
   const [error, setError] = useState('')
 
@@ -28,8 +37,10 @@ function Teams({ apiBaseUrl = 'http://localhost:8000/api' }) {
     let ignore = false
 
     async function loadTeams() {
+      const baseUrl = apiBaseUrl || getApiBaseUrl()
+
       try {
-        const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/teams/`)
+        const response = await fetch(`${baseUrl.replace(/\/$/, '')}/teams/`)
         if (!response.ok) {
           throw new Error('Unable to load teams')
         }
