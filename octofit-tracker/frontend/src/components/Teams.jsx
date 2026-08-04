@@ -21,7 +21,7 @@ function normalizeCollection(payload) {
 }
 
 function getApiBaseUrl() {
-  const codespaceName = import.meta.env.VITE_bookish_funicular?.trim()
+  const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim() || import.meta.env.VITE_bookish_funicular?.trim()
   if (codespaceName) {
     return `https://${codespaceName}-8000.app.github.dev`
   }

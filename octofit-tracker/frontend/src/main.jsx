@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './index.css'
 import App from './App.jsx'
 
-const appLabel = import.meta.env.VITE_bookish_funicular?.trim()
+const appLabel = import.meta.env.VITE_CODESPACE_NAME?.trim() || import.meta.env.VITE_bookish_funicular?.trim()
 document.title = appLabel ? `OctoFit Tracker • ${appLabel}` : 'OctoFit Tracker'
 
 const rootElement = document.getElementById('root')
