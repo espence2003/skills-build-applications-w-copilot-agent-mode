@@ -7,7 +7,6 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 require("./config/database");
-const apiUrl_1 = require("./config/apiUrl");
 const Activity_1 = __importDefault(require("./models/Activity"));
 const Team_1 = __importDefault(require("./models/Team"));
 const User_1 = __importDefault(require("./models/User"));
@@ -15,10 +14,14 @@ const Workout_1 = __importDefault(require("./models/Workout"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = Number(process.env.PORT) || 8000;
+const codespaceName = process.env.CODESPACE_NAME?.trim();
+const apiBaseUrl = codespaceName
+    ? `https://${codespaceName}-8000.app.github.dev`
+    : 'http://localhost:8000';
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', service: 'octofit-backend', apiBaseUrl: (0, apiUrl_1.getApiBaseUrl)() });
+    res.json({ status: 'ok', service: 'octofit-backend', apiBaseUrl });
 });
 app.get(['/api/users', '/api/users/'], async (_req, res) => {
     try {
@@ -103,5 +106,5 @@ app.post(['/api/workouts', '/api/workouts/'], async (req, res) => {
 });
 app.listen(port, () => {
     console.log(`OctoFit backend listening on port ${port}`);
-    console.log(`API base URL: ${(0, apiUrl_1.getApiBaseUrl)()}`);
+    console.log(`API base URL: ${apiBaseUrl}`);
 });
