@@ -1,27 +1,22 @@
-import { useEffect, useState } from 'react'
-import { Link, Route, Routes } from 'react-router-dom'
+import { Link, NavLink, Route, Routes } from 'react-router-dom'
+import Activities from './components/Activities'
+import Leaderboard from './components/Leaderboard'
+import Teams from './components/Teams'
+import Users from './components/Users'
+import Workouts from './components/Workouts'
 import './App.css'
 
-const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim() || ''
-const API_BASE_URL = codespaceName
-  ? `https://${codespaceName}-8000.app.github.dev/api`
-  : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api')
+function getApiBaseUrl() {
+  const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim()
+  if (codespaceName) {
+    return `https://${codespaceName}-8000.app.github.dev/api`
+  }
+
+  return import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8000/api'
+}
 
 function Home() {
-  const [leaderboard, setLeaderboard] = useState([])
-  const [activities, setActivities] = useState([])
-
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/leaderboard`)
-      .then((response) => response.json())
-      .then((data) => setLeaderboard(data))
-      .catch(() => setLeaderboard([]))
-
-    fetch(`${API_BASE_URL}/activities`)
-      .then((response) => response.json())
-      .then((data) => setActivities(data))
-      .catch(() => setActivities([]))
-  }, [])
+  const apiBaseUrl = getApiBaseUrl()
 
   return (
     <div className="row g-4 align-items-start">
@@ -30,109 +25,19 @@ function Home() {
         <p className="lead text-muted">
           A modern multi-tier fitness experience for teams, workouts, and leaderboards.
         </p>
-        <div className="d-flex gap-3 mt-4">
+        <div className="d-flex flex-wrap gap-3 mt-4">
           <Link to="/teams" className="btn btn-primary">View teams</Link>
           <Link to="/leaderboard" className="btn btn-outline-primary">See leaderboard</Link>
+          <Link to="/activities" className="btn btn-outline-secondary">View activities</Link>
+          <Link to="/users" className="btn btn-outline-secondary">View users</Link>
+          <Link to="/workouts" className="btn btn-outline-secondary">View workouts</Link>
         </div>
       </div>
       <div className="col-lg-5">
-        <div className="card shadow-sm border-0">
-          <div className="card-body">
-            <h2 className="h4">Recent activity</h2>
-            <ul className="list-group list-group-flush">
-              {activities.length > 0 ? (
-                activities.map((activity) => (
-                  <li key={activity._id} className="list-group-item px-0">
-                    {activity.studentName} logged {activity.activityType} for {activity.durationMinutes} min.
-                  </li>
-                ))
-              ) : (
-                <li className="list-group-item px-0">No activity yet.</li>
-              )}
-            </ul>
-          </div>
-        </div>
+        <Activities apiBaseUrl={apiBaseUrl} />
       </div>
       <div className="col-12">
-        <div className="card shadow-sm border-0">
-          <div className="card-body">
-            <h2 className="h4">Leaderboard</h2>
-            <ul className="list-group list-group-flush">
-              {leaderboard.length > 0 ? (
-                leaderboard.map((entry) => (
-                  <li key={entry.name} className="list-group-item d-flex justify-content-between">
-                    <span>{entry.name}</span>
-                    <span className="fw-bold">{entry.points} pts</span>
-                  </li>
-                ))
-              ) : (
-                <li className="list-group-item">No leaderboard data yet.</li>
-              )}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function Teams() {
-  const [teams, setTeams] = useState([])
-
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/teams`)
-      .then((response) => response.json())
-      .then((data) => setTeams(data))
-      .catch(() => setTeams([]))
-  }, [])
-
-  return (
-    <div className="card shadow-sm border-0">
-      <div className="card-body">
-        <h2 className="h4">Teams</h2>
-        <ul className="list-group list-group-flush">
-          {teams.length > 0 ? (
-            teams.map((team) => (
-              <li key={team._id} className="list-group-item d-flex justify-content-between">
-                <span>{team.name}</span>
-                <span className="badge text-bg-primary">{team.members.length} members</span>
-              </li>
-            ))
-          ) : (
-            <li className="list-group-item">No teams yet.</li>
-          )}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-function Leaderboard() {
-  const [leaderboard, setLeaderboard] = useState([])
-
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/leaderboard`)
-      .then((response) => response.json())
-      .then((data) => setLeaderboard(data))
-      .catch(() => setLeaderboard([]))
-  }, [])
-
-  return (
-    <div className="card shadow-sm border-0">
-      <div className="card-body">
-        <h2 className="h4">Leaderboard</h2>
-        <ul className="list-group list-group-flush">
-          {leaderboard.length > 0 ? (
-            leaderboard.map((entry) => (
-              <li key={entry.name} className="list-group-item d-flex justify-content-between">
-                <span>{entry.name}</span>
-                <span className="fw-bold">{entry.points} pts</span>
-              </li>
-            ))
-          ) : (
-            <li className="list-group-item">No leaderboard data yet.</li>
-          )}
-        </ul>
+        <Leaderboard apiBaseUrl={apiBaseUrl} />
       </div>
     </div>
   )
@@ -145,20 +50,32 @@ function App() {
         <Link className="navbar-brand fw-bold" to="/">
           OctoFit Tracker
         </Link>
-        <div className="d-flex gap-2">
-          <Link className="nav-link text-light" to="/teams">
+        <div className="d-flex flex-wrap gap-2">
+          <NavLink className={({ isActive }) => `nav-link text-light ${isActive ? 'fw-bold' : ''}`} to="/teams">
             Teams
-          </Link>
-          <Link className="nav-link text-light" to="/leaderboard">
+          </NavLink>
+          <NavLink className={({ isActive }) => `nav-link text-light ${isActive ? 'fw-bold' : ''}`} to="/leaderboard">
             Leaderboard
-          </Link>
+          </NavLink>
+          <NavLink className={({ isActive }) => `nav-link text-light ${isActive ? 'fw-bold' : ''}`} to="/activities">
+            Activities
+          </NavLink>
+          <NavLink className={({ isActive }) => `nav-link text-light ${isActive ? 'fw-bold' : ''}`} to="/users">
+            Users
+          </NavLink>
+          <NavLink className={({ isActive }) => `nav-link text-light ${isActive ? 'fw-bold' : ''}`} to="/workouts">
+            Workouts
+          </NavLink>
         </div>
       </nav>
       <main className="container py-4">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/teams" element={<Teams />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/teams" element={<Teams apiBaseUrl={getApiBaseUrl()} />} />
+          <Route path="/leaderboard" element={<Leaderboard apiBaseUrl={getApiBaseUrl()} />} />
+          <Route path="/activities" element={<Activities apiBaseUrl={getApiBaseUrl()} />} />
+          <Route path="/users" element={<Users apiBaseUrl={getApiBaseUrl()} />} />
+          <Route path="/workouts" element={<Workouts apiBaseUrl={getApiBaseUrl()} />} />
         </Routes>
       </main>
     </div>
