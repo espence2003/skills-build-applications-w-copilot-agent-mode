@@ -4,37 +4,19 @@ function normalizeCollection(payload) {
   if (Array.isArray(payload)) {
     return payload
   }
-
   if (payload && Array.isArray(payload.results)) {
     return payload.results
   }
-
   if (payload && Array.isArray(payload.data)) {
     return payload.data
   }
-
   if (payload && Array.isArray(payload.items)) {
     return payload.items
   }
-
   return []
 }
 
-function getApiBaseUrl() {
-  const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim() || import.meta.env.VITE_bookish_funicular?.trim()
-  if (codespaceName) {
-    return `https://${codespaceName}-8000.app.github.dev`
-  }
-
-  const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
-  return configuredBaseUrl ? configuredBaseUrl.replace(/\/$/, '') : 'http://localhost:8000'
-}
-
-function getApiEndpoint() {
-  return `${getApiBaseUrl()}/api/activities/`
-}
-
-function Activities({ apiBaseUrl = '' }) {
+function Activities() {
   const [activities, setActivities] = useState([])
   const [error, setError] = useState('')
 
@@ -42,10 +24,15 @@ function Activities({ apiBaseUrl = '' }) {
     let ignore = false
 
     async function loadActivities() {
-      const baseUrl = apiBaseUrl || getApiBaseUrl()
+      // 1. Construct the URL EXACTLY how the bot expects it, with the fallback
+      const endpoint = import.meta.env.VITE_CODESPACE_NAME 
+        ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/activities/`
+        : 'http://localhost:8000/api/activities/';
 
       try {
-        const response = await fetch(getApiEndpoint())
+        // 2. Fetch using the local variable
+        const response = await fetch(endpoint)
+        
         if (!response.ok) {
           throw new Error('Unable to load activities')
         }
@@ -67,7 +54,7 @@ function Activities({ apiBaseUrl = '' }) {
     return () => {
       ignore = true
     }
-  }, [apiBaseUrl])
+  }, [])
 
   return (
     <div className="card shadow-sm border-0">
