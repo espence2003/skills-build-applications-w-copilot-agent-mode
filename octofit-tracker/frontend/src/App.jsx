@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import './App.css'
 
-const API_BASE_URL = 'http://localhost:8000/api'
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim() || ''
+const API_BASE_URL = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev/api`
+  : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api')
 
 function Home() {
   const [leaderboard, setLeaderboard] = useState([])
