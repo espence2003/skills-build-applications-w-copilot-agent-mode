@@ -23,10 +23,15 @@ function normalizeCollection(payload) {
 function getApiBaseUrl() {
   const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim()
   if (codespaceName) {
-    return `https://${codespaceName}-8000.app.github.dev/api`
+    return `https://${codespaceName}-8000.app.github.dev`
   }
 
-  return import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8000/api'
+  const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
+  return configuredBaseUrl ? configuredBaseUrl.replace(/\/$/, '') : 'http://localhost:8000'
+}
+
+function getApiEndpoint(path) {
+  return `${getApiBaseUrl()}/api/${path}/`
 }
 
 function Activities({ apiBaseUrl = '' }) {
@@ -40,7 +45,7 @@ function Activities({ apiBaseUrl = '' }) {
       const baseUrl = apiBaseUrl || getApiBaseUrl()
 
       try {
-        const response = await fetch(`${baseUrl.replace(/\/$/, '')}/activities/`)
+        const response = await fetch(getApiEndpoint('activities'))
         if (!response.ok) {
           throw new Error('Unable to load activities')
         }
